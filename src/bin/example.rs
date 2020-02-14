@@ -13,18 +13,20 @@ fn main() {
     let (x, y) = read_banknote_authentication_dataset();
 
     let decision_tree = DecisionTreeClassifier::new(
-        3, 3, EntropySelectionMeasure::new(),
+        3,
+        3,
+        EntropySelectionMeasure::new(),
     );
 
     info!("{:?}", decision_tree);
 
-    let m = decision_tree.fit(x.view(), y.view());
+    let model = decision_tree.fit(x.view(), y.view());
 
-    info!("trained model");
+    info!("trained model: {:#?}", model);
 
     let test = array![[0.062525,2.9301,-3.5467,-2.6737]];
 
-    let result = m.predict(test.view());
+    let result = model.predict(test.view());
 
     info!("Result from test of {:} was {:}", test, result);
 }

@@ -1,44 +1,53 @@
 extern crate ndarray;
 
 use std::collections::HashMap;
+use std::fmt::Debug;
 
 use log::*;
 use ndarray::{Array1, ArrayView1, ArrayView2, Axis};
 
-use crate::measures::entropy::EntropySelectionMeasure;
 use crate::measures::SelectionMeasure;
-use std::fmt::Debug;
+
+use self::ndarray::ArrayView;
+use crate::measures::entropy::entropy;
 
 #[derive(Debug)]
 pub struct DecisionTreeClassifier<T: SelectionMeasure> {
     max_depth: u32,
-    min_size: u32,
+    min_size: usize,
     selection_measure: T,
 }
 
-trait DecisionTreeNode {
-    fn predict(&self, x: ArrayView1<f64>) -> f64;
+#[derive(Debug)]
+enum DecisionTreeNode {
+    Interior {
+        feature: usize,
+        threshold: f64,
+        left: Box<DecisionTreeNode>,
+        right: Box<DecisionTreeNode>,
+    },
+    Leaf {
+        probability: f64,
+    },
 }
 
-#[derive(PartialEq)]
-struct TerminalNode {
-    prediction: usize
-}
-
-impl TerminalNode {
-    fn new(value: usize) -> TerminalNode {
-        TerminalNode {
-            prediction: value
+impl DecisionTreeNode {
+    fn new_interior(
+        feature: usize,
+        threshold: f64,
+        left: DecisionTreeNode,
+        right: DecisionTreeNode,
+    ) -> DecisionTreeNode {
+        DecisionTreeNode::Interior {
+            feature,
+            threshold,
+            left: Box::new(left),
+            right: Box::new(right),
         }
     }
 
-    fn from_labels(y: ArrayView1<f64>) -> TerminalNode {
-        let distribution = y
-            .fold(HashMap::new(), |mut histogram, elem: &f64| {
-                let key = *elem as usize;
-                *histogram.entry(key).or_insert(0) += 1;
-                histogram
-            });
+    fn new_leaf_node(y: ArrayView1<f64>) -> DecisionTreeNode {
+        let distribution = histogram(y);
 
         let (key, _) = distribution
             .iter()
@@ -46,41 +55,26 @@ impl TerminalNode {
                 value
             }).unwrap();
 
-        TerminalNode::new(*key)
+        DecisionTreeNode::Leaf { probability: *key as f64 }
+    }
+
+    pub fn predict(&self, x: ArrayView1<f64>) -> f64 {
+        return match *self {
+            DecisionTreeNode::Interior { feature, threshold, ref left, ref right } => {
+                if x[feature] < threshold {
+                    left.predict(x)
+                } else {
+                    right.predict(x)
+                }
+            }
+            DecisionTreeNode::Leaf { probability } => { return probability; }
+        };
     }
 }
 
-impl DecisionTreeNode for TerminalNode {
-    fn predict(&self, _: ArrayView1<f64>) -> f64 {
-        return self.prediction as f64;
-    }
-}
-
-struct InteriorNode {
-    left: Box<dyn DecisionTreeNode>,
-    right: Box<dyn DecisionTreeNode>,
-    feature: usize,
-    threshold: f64,
-}
-
-impl InteriorNode {
-    fn new(
-        left: Box<dyn DecisionTreeNode>,
-        right: Box<dyn DecisionTreeNode>,
-        feature: usize,
-        threshold: f64,
-    ) -> InteriorNode {
-        InteriorNode {
-            left,
-            right,
-            feature,
-            threshold,
-        }
-    }
-}
-
+#[derive(Debug)]
 pub struct DecisionTreeModel {
-    tree: Box<dyn DecisionTreeNode>
+    tree: DecisionTreeNode
 }
 
 impl DecisionTreeModel {
@@ -97,18 +91,8 @@ impl DecisionTreeModel {
     }
 }
 
-impl DecisionTreeNode for InteriorNode {
-    fn predict(&self, x: ArrayView1<f64>) -> f64 {
-        if x[self.feature] < self.threshold {
-            self.left.predict(x)
-        } else {
-            self.right.predict(x)
-        }
-    }
-}
-
-impl <SM: SelectionMeasure + Debug> DecisionTreeClassifier<SM> {
-    pub fn new(max_depth: u32, min_size: u32, selection_measure: SM) -> DecisionTreeClassifier<SM> {
+impl<SM: SelectionMeasure + Debug> DecisionTreeClassifier<SM> {
+    pub fn new(max_depth: u32, min_size: usize, selection_measure: SM) -> DecisionTreeClassifier<SM> {
         DecisionTreeClassifier {
             max_depth,
             min_size,
@@ -118,52 +102,36 @@ impl <SM: SelectionMeasure + Debug> DecisionTreeClassifier<SM> {
 
     pub fn fit(&self, x: ArrayView2<f64>, y: ArrayView1<f64>) -> DecisionTreeModel {
         DecisionTreeModel {
-            tree: self.build_tree(x, y, self.max_depth)
+            tree: self.build_tree(x, y, 0)
         }
     }
 
-    fn build_tree(&self, x: ArrayView2<f64>, y: ArrayView1<f64>, depth: u32) -> Box<dyn DecisionTreeNode> {
+    fn build_tree(&self, x: ArrayView2<f64>, y: ArrayView1<f64>, depth: u32) -> DecisionTreeNode {
         info!("Current depth of: {:}", depth);
+
+        let current_entropy = entropy(y);
+
+        if y.len() <= self.min_size || depth > self.max_depth || current_entropy == 0. {
+            return DecisionTreeNode::new_leaf_node(y)
+        }
 
         let (left_indexes,
             right_indexes,
             threshold,
             feature) = self.determine_optimal_split_point(x, y);
 
+
         let left_y = y.select(Axis(0), left_indexes.as_ref());
         let right_y = y.select(Axis(0), right_indexes.as_ref());
 
-        if depth <= 1 {
-            let left = Box::new(TerminalNode::from_labels(left_y.view()));
-            let right = Box::new(TerminalNode::from_labels(right_y.view()));
+        let left = self.build_tree(x.select(Axis(0), left_indexes.as_ref()).view(), left_y.view(), depth + 1);
+        let right = self.build_tree(x.select(Axis(0), right_indexes.as_ref()).view(), right_y.view(), depth + 1);
 
-            return Box::new(
-                InteriorNode::new(
-                    left,
-                    right,
-                    feature,
-                    threshold,
-                )
-            );
-        }
-
-        if left_y.is_empty() || right_y.is_empty() {
-            if left_y.is_empty() {
-                return Box::new(TerminalNode::from_labels(right_y.view()));
-            }
-            return Box::new(TerminalNode::from_labels(left_y.view()));
-        }
-
-        let left = self.build_tree(x.select(Axis(0), left_indexes.as_ref()).view(), left_y.view(), depth - 1);
-        let right = self.build_tree(x.select(Axis(0), right_indexes.as_ref()).view(), right_y.view(), depth - 1);
-
-        return Box::new(
-            InteriorNode::new(
-                left,
-                right,
-                feature,
-                threshold,
-            )
+        return DecisionTreeNode::new_interior(
+            feature,
+            threshold,
+            left,
+            right,
         );
     }
 
@@ -223,6 +191,14 @@ impl <SM: SelectionMeasure + Debug> DecisionTreeClassifier<SM> {
 
         return (left, right);
     }
+}
+
+fn histogram(ds: ArrayView1<f64>) -> HashMap<usize, usize> {
+    ds.fold(HashMap::new(), |mut histogram, elem: &f64| {
+        let key = *elem as usize;
+        *histogram.entry(key).or_insert(0) += 1;
+        histogram
+    })
 }
 
 #[cfg(test)]

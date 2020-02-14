@@ -23,28 +23,13 @@ pub fn read_banknote_authentication_dataset() -> (Array2<f64>, Array1<f64>) {
 
 pub fn read_static_dataset() -> (Array2<f64>, Array1<f64>) {
     let x = array![
-        [80., 20.],
-        [66., 32.],
-        [43., 12.],
-        [82., 28.],
-        [65., 32.],
-        [42., 35.],
-        [70., 39.,],
-        [81., 45.,],
-        [69., 12.],
+        [1., 1.],
+        [2., 2.],
+        [3., 3.],
     ];
 
     let y = array![
-        0.,
-        1.,
-        1.,
-        1.,
-        0.,
-        0.,
-        1.,
-        0.,
-        1.,
-        0.,
+        1., 1., 0.
     ];
 
     return (x, y);
