@@ -6,10 +6,16 @@ use std::fmt::Debug;
 use log::*;
 use ndarray::{Array1, ArrayView1, ArrayView2, Axis};
 
+use crate::measures::entropy::entropy;
 use crate::measures::SelectionMeasure;
 
 use self::ndarray::ArrayView;
-use crate::measures::entropy::entropy;
+
+pub mod feature_selector;
+
+trait FeatureSelector {
+    fn apply(&self, x: ArrayView2<f64>);
+}
 
 #[derive(Debug)]
 pub struct DecisionTreeClassifier<T: SelectionMeasure> {
@@ -107,12 +113,12 @@ impl<SM: SelectionMeasure + Debug> DecisionTreeClassifier<SM> {
     }
 
     fn build_tree(&self, x: ArrayView2<f64>, y: ArrayView1<f64>, depth: u32) -> DecisionTreeNode {
-        info!("Current depth of: {:}", depth);
-
         let current_entropy = entropy(y);
+        info!("Current entropy of split: {:.5}", current_entropy);
 
         if y.len() <= self.min_size || depth > self.max_depth || current_entropy == 0. {
-            return DecisionTreeNode::new_leaf_node(y)
+            info!("Terminating branch with a leaf");
+            return DecisionTreeNode::new_leaf_node(y);
         }
 
         let (left_indexes,
@@ -122,9 +128,11 @@ impl<SM: SelectionMeasure + Debug> DecisionTreeClassifier<SM> {
 
 
         let left_y = y.select(Axis(0), left_indexes.as_ref());
-        let right_y = y.select(Axis(0), right_indexes.as_ref());
-
+        info!("Current depth of: {:} and drafting left side of node", depth);
         let left = self.build_tree(x.select(Axis(0), left_indexes.as_ref()).view(), left_y.view(), depth + 1);
+
+        let right_y = y.select(Axis(0), right_indexes.as_ref());
+        info!("Current depth of: {:} and drafting right side of node", depth);
         let right = self.build_tree(x.select(Axis(0), right_indexes.as_ref()).view(), right_y.view(), depth + 1);
 
         return DecisionTreeNode::new_interior(
@@ -167,7 +175,6 @@ impl<SM: SelectionMeasure + Debug> DecisionTreeClassifier<SM> {
         }
 
         info!("Found best split: [X{:} < {:.2}] when information gain = {:.5}", best_split_column, best_split_value, best_score);
-
 
         (
             best_left_indexes,

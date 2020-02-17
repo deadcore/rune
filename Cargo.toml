@@ -12,6 +12,7 @@ env_logger = "^0.7"
 ndarray = "^0.13"
 ndarray-csv = "^0.4"
 csv = "^1.1"
+rand = "^0.7"
 
 [[bin]]
 name = 'example'
