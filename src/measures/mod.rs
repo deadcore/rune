@@ -1,7 +1,8 @@
 use ndarray::ArrayView1;
+use std::hash::Hash;
 
 pub mod entropy;
 
 pub trait SelectionMeasure {
-    fn apply(&self, dataset: ArrayView1<f64>, left_indexes: &[usize], right_indexes: &[usize]) -> f64;
+    fn apply<T: Copy + Eq + Hash>(&self, dataset: ArrayView1<T>, left_indexes: &[usize], right_indexes: &[usize]) -> f64;
 }

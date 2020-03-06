@@ -1,7 +1,7 @@
 use ndarray::{Array1, Array2, ArrayView1, ArrayView2, Axis};
 use rand::prelude::*;
 
-pub fn train_test_split(x: ArrayView2<f64>, y: ArrayView1<f64>, ratio: f32) -> (Array2<f64>, Array2<f64>, Array1<f64>, Array1<f64>) {
+pub fn train_test_split<X: Copy, Y: Copy>(x: ArrayView2<X>, y: ArrayView1<Y>, ratio: f32) -> (Array2<X>, Array2<X>, Array1<Y>, Array1<Y>) {
     let mut rng = rand::thread_rng();
     let mut left = Vec::new();
     let mut right = Vec::new();

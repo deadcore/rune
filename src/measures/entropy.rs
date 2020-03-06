@@ -1,14 +1,15 @@
-use std::collections::HashMap;
+use std::hash::Hash;
 
 use ndarray::{ArrayView1, Axis};
 
+use crate::math::histogram::histogram;
 use crate::measures::SelectionMeasure;
 
 #[derive(Debug)]
 pub struct EntropySelectionMeasure {}
 
 impl SelectionMeasure for EntropySelectionMeasure {
-    fn apply(&self, dataset: ArrayView1<f64>, left_indexes: &[usize], right_indexes: &[usize]) -> f64 {
+    fn apply<T: Copy + Eq + Hash>(&self, dataset: ArrayView1<T>, left_indexes: &[usize], right_indexes: &[usize]) -> f64 {
         let total_entropy = entropy(dataset);
         let left_entropy = entropy(dataset.select(Axis(0), left_indexes).view());
         let right_entropy = entropy(dataset.select(Axis(0), right_indexes).view());
@@ -29,20 +30,16 @@ impl EntropySelectionMeasure {
     }
 }
 
-pub fn entropy(dataset: ArrayView1<f64>) -> f64 {
+pub fn entropy<T: Eq + Hash + Copy>(dataset: ArrayView1<T>) -> f64 {
     let length = dataset.len();
 
-    let ent: f64 = dataset
-        .fold(HashMap::new(), |mut histogram, elem: &f64| {
-            let key = *elem as usize;
-            *histogram.entry(key).or_insert(0) += 1;
-            histogram
-        })
+    let distribution = histogram(dataset);
+
+    let ent: f64 = distribution
         .values()
-        .map(|h| *h as f64 / length as f64)
+        .map(|&h| h as f64 / length as f64)
         .map(|ratio| ratio * ratio.log2())
         .sum();
 
     -1.0 * ent
 }
-
