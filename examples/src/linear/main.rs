@@ -10,7 +10,7 @@ use rune_metrics::regression::r2::r2;
 fn main() {
     env_logger::init();
 
-    let df = read_headbrain_dataset();
+    let df = read_headbrain_dataset().unwrap();
 
     let x = df.slice(s![.., ..3]);
     let y = df.slice(s![.., 3]);
