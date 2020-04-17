@@ -1,0 +1,16 @@
+[package]
+name = "rune-tree"
+version = "0.1.0"
+authors = ["Jack <admin@deadcore.co.uk>"]
+edition = "2018"
+workspace = "../.."
+
+[features]
+default = []
+
+[lib]
+name = "rune_tree"
+
+[dependencies]
+log = "^0.4"
+ndarray = "^0.13"

@@ -1,22 +1,18 @@
-extern crate ndarray;
-
 use log::*;
+use rune_data::read_banknote_authentication_dataset;
+use rune_metrics::confusion_matrix::ConfusionMatrix;
+use rune_model_selection::splitting::train_test_split::train_test_split;
+use rune_tree::DecisionTreeClassifier;
+use rune_tree::feature_selector::greedy_feature_selector::GreedyFeatureSelector;
+use rune_tree::measures::entropy::EntropySelectionMeasure;
 
-use rust_decision_tree::data::{read_banknote_authentication_dataset, read_static_dataset, read_wine_quality_dataset, xor_dataset};
-use rust_decision_tree::measures::entropy::EntropySelectionMeasure;
-use rust_decision_tree::metrics::ConfusionMatrix;
-use rust_decision_tree::model_selection::splitting::train_test_split;
-use rust_decision_tree::tree::DecisionTreeClassifier;
-use rust_decision_tree::tree::feature_selector::greedy_feature_selector::GreedyFeatureSelector;
-use rust_decision_tree::metrics::confusion_matrix::ConfusionMatrix;
 
 fn main() {
     env_logger::init();
 
-    let (x, y) = read_static_dataset();
+    let (x, y) = read_banknote_authentication_dataset();
 
     let mut cm = ConfusionMatrix::from_labels(y.view());
-
 
     let (x_train, x_test, y_train, y_test) = train_test_split(x.view(), y.view(), 0.8);
 
@@ -50,5 +46,4 @@ fn main() {
     info!("recall:    {:.5}", cm.recall());
     info!("precision: {:.5}", cm.precision());
     info!("f1:        {:.5}", cm.f1());
-
 }

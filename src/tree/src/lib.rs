@@ -1,14 +1,16 @@
+pub mod feature_selector;
+pub mod measures;
+pub mod math;
+
 use std::fmt::Debug;
 use std::hash::Hash;
 
 use log::*;
 use ndarray::{Array1, ArrayView1, ArrayView2, Axis};
-
-use crate::measures::entropy::entropy;
-use crate::tree::feature_selector::FeatureSelector;
+use crate::feature_selector::FeatureSelector;
 use crate::math::histogram::histogram;
+use crate::measures::entropy::entropy;
 
-pub mod feature_selector;
 
 #[derive(Debug)]
 pub struct DecisionTreeClassifier<FS> {
@@ -76,7 +78,7 @@ pub struct DecisionTreeModel<T> {
     tree: DecisionTreeNode<T>
 }
 
-impl <T: Eq + Hash + Default + Copy> DecisionTreeModel<T> {
+impl<T: Eq + Hash + Default + Copy> DecisionTreeModel<T> {
     pub fn predict(&self, x: ArrayView2<f64>) -> Array1<T> {
         let mut results = Array1::<T>::default(x.nrows());
 

@@ -1,0 +1,19 @@
+[package]
+name = "rune-model-selection"
+version = "0.1.0"
+authors = ["Jack <admin@deadcore.co.uk>"]
+edition = "2018"
+workspace = "../.."
+
+[features]
+default = []
+
+[lib]
+name = "rune_model_selection"
+
+[dependencies]
+log = "^0.4"
+ndarray = "^0.13"
+ndarray-rand="^0.11"
+rand = "^0.7"
+rand_isaac = "^0.2"

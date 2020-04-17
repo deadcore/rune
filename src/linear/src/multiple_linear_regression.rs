@@ -1,4 +1,4 @@
-use ndarray::{ArrayView1, ArrayView2, Array1, Array, Axis, stack, Array2};
+use ndarray::{ArrayView1, ArrayView2, Array1, Axis, stack, Array2};
 use log::*;
 
 #[derive(Debug)]
@@ -53,7 +53,6 @@ impl MultipleLinearRegression {
     }
 
     fn gradient_descent(&self, x: ArrayView2<f64>, y: ArrayView1<f64>, beta: ArrayView1<f64>) -> Array1<f64> {
-        let cost_history: Array1<usize> = Array1::zeros(self.iterations);
         let m = y.len();
 
         let mut beta = beta.to_owned();

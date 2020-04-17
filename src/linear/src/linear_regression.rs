@@ -1,5 +1,4 @@
-use log::*;
-use ndarray::{Array1, ArrayView1, ArrayView2, azip, Zip};
+use ndarray::{Array1, ArrayView1, Zip};
 
 #[derive(Debug)]
 pub struct LinearRegressionRegressor {}

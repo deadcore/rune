@@ -5,7 +5,7 @@ use log::*;
 use ndarray::{ArrayView1, ArrayView2};
 
 use crate::measures::SelectionMeasure;
-use crate::tree::feature_selector::{FeatureSelector, SplitResult};
+use crate::feature_selector::{FeatureSelector, SplitResult};
 
 #[derive(Debug)]
 pub struct GreedyFeatureSelector<SM: SelectionMeasure> {

@@ -1,0 +1,32 @@
+[package]
+name = "rune-examples"
+version = "0.1.0"
+publish = false
+workspace = ".."
+edition = "2018"
+
+[dependencies]
+rune-linear = { path = "../src/linear" }
+rune-data = { path = "../src/data" }
+rune-model-selection = { path = "../src/model_selection" }
+rune-metrics = { path = '../src/metrics' }
+rune-tree = { path = '../src/tree' }
+
+log = "^0.4"
+env_logger = "^0.7"
+ndarray = "^0.13"
+csv = "^1.1"
+rand = "^0.7"
+rand_isaac = "^0.2"
+
+[[bin]]
+name = 'multiple_linear_regression'
+path = 'src/multiple_linear_regression/main.rs'
+
+[[bin]]
+name = 'linear_regression'
+path = 'src/linear/main.rs'
+
+[[bin]]
+name = 'decision_tree'
+path = 'src/tree/main.rs'

@@ -13,24 +13,26 @@ use ndarray_rand::RandomExt;
 use rand_isaac::isaac64::Isaac64Rng;
 
 pub fn read_headbrain_dataset() -> Array2<f64> {
-    let file = File::open("headbrain.csv").unwrap();
-    let mut reader = ReaderBuilder::new().has_headers(true).from_reader(file);
+    let csv = include_str!("../headbrain.csv");
+
+    let mut reader = ReaderBuilder::new().has_headers(true).from_reader(csv.as_bytes());
     let dataset: Array2<f64> = reader.deserialize_array2((237, 4)).unwrap();
 
     return dataset.into_owned();
 }
 
 pub fn read_student() -> Array2<f64> {
-    let file = File::open("student.csv").unwrap();
-    let mut reader = ReaderBuilder::new().has_headers(true).from_reader(file);
+    let csv = include_str!("../student.csv");
+    let mut reader = ReaderBuilder::new().has_headers(true).from_reader(csv.as_bytes());
     let dataset: Array2<f64> = reader.deserialize_array2((1000, 3)).unwrap();
 
     return dataset.into_owned();
 }
 
 pub fn read_banknote_authentication_dataset() -> (Array2<f64>, Array1<bool>) {
-    let file = File::open("data_banknote_authentication.csv").unwrap();
-    let mut reader = ReaderBuilder::new().has_headers(false).from_reader(file);
+    let csv = include_str!("../data_banknote_authentication.csv");
+
+    let mut reader = ReaderBuilder::new().has_headers(false).from_reader(csv.as_bytes());
     let dataset: Array2<f64> = reader.deserialize_array2((1372, 5)).unwrap();
 
     let x = dataset.slice(s![.., ..4]);
@@ -50,7 +52,7 @@ pub fn read_wine_quality_dataset() -> (Array2<f64>, Array1<f64>) {
 
     let x = dataset.slice(s![.., ..11]);
     let y = dataset.slice(s![.., 11]);
-        // .map(|x| *x as u8);
+    // .map(|x| *x as u8);
 
     return (x.into_owned(), y.into_owned());
 }
@@ -64,33 +66,4 @@ pub fn xor_dataset(count: usize) -> (Array2<f64>, Array1<bool>) {
     azip!((y in &mut y, row in x.genrows()) *y = if (row[0] > 0.5 && row[1] > 0.5) || (row[0] < 0.5 && row[1] < 0.5) {true} else {false});
 
     return (x.into_owned(), y.into_owned());
-}
-
-pub fn read_static_dataset() -> (Array2<f64>, Array1<bool>) {
-    let x = array![
-        [80., 20.],
-        [66., 32.],
-        [43., 12.],
-        [82., 28.],
-        [65., 32.],
-        [42., 35.],
-        [70., 39.,],
-        [81., 45.,],
-        [69., 12.],
-    ];
-
-    let y = array![
-        false,
-        true,
-        true,
-        true,
-        false,
-        false,
-        true,
-        false,
-        true,
-        false,
-    ];
-
-    return (x, y);
 }

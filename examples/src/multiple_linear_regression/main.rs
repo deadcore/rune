@@ -1,15 +1,12 @@
 use log::*;
 
-use rust_decision_tree::data::{read_banknote_authentication_dataset, read_static_dataset, read_wine_quality_dataset, xor_dataset, read_headbrain_dataset, read_student};
-use rust_decision_tree::measures::entropy::EntropySelectionMeasure;
-use rust_decision_tree::metrics::root_mean_squared_error::{r2, root_mean_squared_error};
-use rust_decision_tree::model_selection::splitting::train_test_split;
-use rust_decision_tree::regression::linear_regression::LinearRegressionRegressor;
-use rust_decision_tree::tree::DecisionTreeClassifier;
-use rust_decision_tree::tree::feature_selector::greedy_feature_selector::GreedyFeatureSelector;
-
 use ndarray::s;
-use rust_decision_tree::regression::multiple_linear_regression::MultipleLinearRegression;
+
+use rune_linear::multiple_linear_regression::MultipleLinearRegression;
+use rune_data::read_student;
+use rune_model_selection::splitting::train_test_split::train_test_split;
+use rune_metrics::regression::root_mean_squared_error::root_mean_squared_error;
+use rune_metrics::regression::r2::r2;
 
 fn main() {
     env_logger::init();
@@ -28,7 +25,7 @@ fn main() {
 
     let classifier = MultipleLinearRegression::new(
         0.0001,
-        100000,
+        100,
     );
 
     info!("Classifier: {:#?}", classifier);
