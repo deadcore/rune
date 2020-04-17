@@ -20,6 +20,14 @@ pub fn read_headbrain_dataset() -> Array2<f64> {
     return dataset.into_owned();
 }
 
+pub fn read_student() -> Array2<f64> {
+    let file = File::open("student.csv").unwrap();
+    let mut reader = ReaderBuilder::new().has_headers(true).from_reader(file);
+    let dataset: Array2<f64> = reader.deserialize_array2((1000, 3)).unwrap();
+
+    return dataset.into_owned();
+}
+
 pub fn read_banknote_authentication_dataset() -> (Array2<f64>, Array1<bool>) {
     let file = File::open("data_banknote_authentication.csv").unwrap();
     let mut reader = ReaderBuilder::new().has_headers(false).from_reader(file);
@@ -31,7 +39,7 @@ pub fn read_banknote_authentication_dataset() -> (Array2<f64>, Array1<bool>) {
     return (x.into_owned(), y.into_owned());
 }
 
-pub fn read_wine_quality_dataset() -> (Array2<f64>, Array1<u8>) {
+pub fn read_wine_quality_dataset() -> (Array2<f64>, Array1<f64>) {
     let file = File::open("winequality-white.csv").unwrap();
     let mut reader = ReaderBuilder::new()
         .has_headers(true)
@@ -41,7 +49,8 @@ pub fn read_wine_quality_dataset() -> (Array2<f64>, Array1<u8>) {
     let dataset: Array2<f64> = reader.deserialize_array2((4898, 12)).unwrap();
 
     let x = dataset.slice(s![.., ..11]);
-    let y = dataset.slice(s![.., 11]).map(|x| *x as u8);
+    let y = dataset.slice(s![.., 11]);
+        // .map(|x| *x as u8);
 
     return (x.into_owned(), y.into_owned());
 }

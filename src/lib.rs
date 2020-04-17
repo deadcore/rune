@@ -7,4 +7,3 @@ pub mod measures;
 pub mod metrics;
 pub mod model_selection;
 pub mod math;
-pub mod chart;
