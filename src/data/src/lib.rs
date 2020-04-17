@@ -5,7 +5,7 @@ extern crate ndarray_csv;
 use std::fs::File;
 
 use csv::ReaderBuilder;
-use ndarray::{array, Array, Array1, Array2, azip, s};
+use ndarray::{Array, Array1, Array2, azip, s};
 use ndarray_csv::Array2Reader;
 use ndarray_rand::rand::SeedableRng;
 use ndarray_rand::rand_distr::Uniform;
@@ -23,6 +23,7 @@ pub fn read_headbrain_dataset() -> Array2<f64> {
 
 pub fn read_student() -> Array2<f64> {
     let csv = include_str!("../student.csv");
+
     let mut reader = ReaderBuilder::new().has_headers(true).from_reader(csv.as_bytes());
     let dataset: Array2<f64> = reader.deserialize_array2((1000, 3)).unwrap();
 
@@ -52,7 +53,6 @@ pub fn read_wine_quality_dataset() -> (Array2<f64>, Array1<f64>) {
 
     let x = dataset.slice(s![.., ..11]);
     let y = dataset.slice(s![.., 11]);
-    // .map(|x| *x as u8);
 
     return (x.into_owned(), y.into_owned());
 }
