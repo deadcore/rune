@@ -1,16 +1,21 @@
 use log::*;
+use ndarray::{Array, array, Array1, Array2, azip, s};
+
 use rune_data::read_banknote_authentication_dataset;
 use rune_metrics::confusion_matrix::ConfusionMatrix;
 use rune_model_selection::splitting::train_test_split::train_test_split;
 use rune_tree::DecisionTreeClassifier;
 use rune_tree::feature_selector::greedy_feature_selector::GreedyFeatureSelector;
 use rune_tree::measures::entropy::EntropySelectionMeasure;
-
+use ndarray_type_conversion::MapTypeExt;
 
 fn main() {
     env_logger::init();
 
-    let (x, y) = read_banknote_authentication_dataset();
+    let df = read_banknote_authentication_dataset().unwrap();
+
+    let x = df.slice(s![.., ..4]);
+    let y = df.slice(s![.., 4]).map(|x| if *x == 1. { true } else { false });
 
     let mut cm = ConfusionMatrix::from_labels(y.view());
 

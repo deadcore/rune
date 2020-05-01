@@ -18,6 +18,10 @@ ndarray = "^0.13"
 csv = "^1.1"
 rand = "^0.7"
 rand_isaac = "^0.2"
+ndarray-stats = "0.3.0"
+ndarray-heterogeneous = { path = '../ndarray-heterogeneous' }
+ndarray-type-conversion = { path = '../ndarray-type-conversion' }
+
 
 [[bin]]
 name = 'multiple_linear_regression'
@@ -30,3 +34,7 @@ path = 'src/linear/main.rs'
 [[bin]]
 name = 'decision_tree'
 path = 'src/tree/main.rs'
+
+[[bin]]
+name = 'data'
+path = 'src/data/main.rs'

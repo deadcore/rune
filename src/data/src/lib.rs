@@ -1,10 +1,11 @@
 use csv::ReaderBuilder;
-use ndarray::{Array, Array1, Array2, azip, s};
+use ndarray::{Array, Array1, Array2, azip, array, s};
 use ndarray_csv::{Array2Reader, ReadError};
 use ndarray_rand::rand::SeedableRng;
 use ndarray_rand::rand_distr::Uniform;
 use ndarray_rand::RandomExt;
 use rand_isaac::isaac64::Isaac64Rng;
+
 
 pub fn read_headbrain_dataset() -> Result<Array2<f64>, ndarray_csv::ReadError> {
     let csv = include_str!("../headbrain.csv");
@@ -24,16 +25,13 @@ pub fn read_student() -> Result<Array2<f64>, ReadError> {
     Ok(dataset.into_owned())
 }
 
-pub fn read_banknote_authentication_dataset() -> Result<(Array2<f64>, Array1<bool>), ReadError> {
+pub fn read_banknote_authentication_dataset() -> Result<Array2<f64>, ReadError> {
     let csv = include_str!("../data_banknote_authentication.csv");
 
     let mut reader = ReaderBuilder::new().has_headers(false).from_reader(csv.as_bytes());
     let dataset: Array2<f64> = reader.deserialize_array2((1372, 5))?;
 
-    let x = dataset.slice(s![.., ..4]);
-    let y = dataset.slice(s![.., 4]).map(|x| if *x == 1. { true } else { false });
-
-    Ok((x.into_owned(), y.into_owned()))
+    Ok(dataset)
 }
 
 pub fn read_wine_quality_dataset() -> Result<Array2<f64>, ReadError> {

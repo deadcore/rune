@@ -1,0 +1,15 @@
+[package]
+name = "ndarray-type-conversion"
+version = "0.1.0"
+authors = ["Jack <admin@deadcore.co.uk>"]
+edition = "2018"
+workspace = ".."
+
+[features]
+default = []
+
+[lib]
+name = "ndarray_type_conversion"
+
+[dependencies]
+ndarray = "^0.13"

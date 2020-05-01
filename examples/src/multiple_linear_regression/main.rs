@@ -11,7 +11,7 @@ use rune_metrics::regression::r2::r2;
 fn main() {
     env_logger::init();
 
-    let df = read_student();
+    let df = read_student().unwrap();
 
     let x = df.slice(s![.., ..2]);
     let y = df.slice(s![.., 2]);
@@ -25,7 +25,7 @@ fn main() {
 
     let classifier = MultipleLinearRegression::new(
         0.0001,
-        100,
+        10000,
     );
 
     info!("Classifier: {:#?}", classifier);
