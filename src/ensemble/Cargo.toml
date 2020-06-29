@@ -14,5 +14,3 @@ name = "rune_ensemble"
 [dependencies]
 log = "^0.4"
 ndarray = "^0.13"
-ndarray-rand="^0.11"
-ndarray-csv = "^0.4"

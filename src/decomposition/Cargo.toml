@@ -1,5 +1,5 @@
 [package]
-name = "rune-metrics"
+name = "rune-decomposition"
 version = "0.1.0"
 authors = ["Jack <admin@deadcore.co.uk>"]
 edition = "2018"
@@ -9,9 +9,10 @@ workspace = "../.."
 default = []
 
 [lib]
-name = "rune_metrics"
+name = "rune_decomposition"
 
 [dependencies]
 log = "^0.4"
 ndarray = "^0.13"
-itertools = "^0.9"
+ndarray-stats = "^0.3"
+ndarray-linalg = { version = "^0.12", features = ["intel-mkl"] }

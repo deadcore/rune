@@ -1,13 +1,68 @@
-use ndarray::{Array, Axis, RemoveAxis, ShapeBuilder};
+use ndarray::{Array, RemoveAxis};
 use ndarray::{ArrayBase, DataOwned, Dimension};
-use std::convert::{TryInto, TryFrom};
+use serde::{Deserialize, Deserializer};
 
-
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Clone)]
 pub enum Scalar {
     I64(i64),
     F64(f64),
     BOOL(bool),
+    STRING(String),
+}
+
+use std::fmt;
+
+use serde::de::{self, Visitor};
+
+struct ScalarVisitor;
+
+impl<'de> Visitor<'de> for ScalarVisitor {
+    type Value = Scalar;
+
+    fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
+        formatter.write_str("an integer between -2^31 and 2^31")
+    }
+
+    fn visit_f64<E>(self, value: f64) -> Result<Self::Value, E>
+        where
+            E: de::Error,
+    {
+        Ok(Scalar::F64(value))
+    }
+
+    fn visit_str<E>(self, value: &str) -> Result<Self::Value, E>
+        where
+            E: de::Error,
+    {
+        Ok(Scalar::STRING(value.to_owned()))
+    }
+
+    fn visit_string<E>(self, value: String) -> Result<Self::Value, E>
+        where
+            E: de::Error,
+    {
+        Ok(Scalar::STRING(value))
+    }
+}
+
+impl<'de> Deserialize<'de> for Scalar {
+    fn deserialize<D>(deserializer: D) -> Result<Scalar, D::Error>
+        where
+            D: Deserializer<'de>,
+    {
+        deserializer.deserialize_any(ScalarVisitor)
+    }
+}
+
+impl From<Scalar> for String {
+    fn from(scalar: Scalar) -> Self {
+        match scalar {
+            Scalar::I64(i) => i.to_string(),
+            Scalar::F64(i) => i.to_string(),
+            Scalar::BOOL(i) => i.to_string(),
+            Scalar::STRING(i) => i
+        }
+    }
 }
 
 impl From<Scalar> for f64 {
@@ -16,6 +71,7 @@ impl From<Scalar> for f64 {
             Scalar::I64(i) => i as f64,
             Scalar::F64(i) => i,
             Scalar::BOOL(i) => if i { 1. } else { 0. },
+            Scalar::STRING(i) => 0.0
         }
     }
 }

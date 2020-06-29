@@ -20,3 +20,4 @@ ndarray-csv = "^0.4"
 csv = "^1.1"
 rand = "^0.7"
 rand_isaac = "^0.2"
+ndarray-heterogeneous = { path = '../../ndarray-heterogeneous' }

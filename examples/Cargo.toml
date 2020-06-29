@@ -11,6 +11,8 @@ rune-data = { path = "../src/data" }
 rune-model-selection = { path = "../src/model_selection" }
 rune-metrics = { path = '../src/metrics' }
 rune-tree = { path = '../src/tree' }
+rune-decomposition = { path = '../src/decomposition' }
+rune-preprocessing = { path = '../src/preprocessing' }
 
 log = "^0.4"
 env_logger = "^0.7"
@@ -21,7 +23,7 @@ rand_isaac = "^0.2"
 ndarray-stats = "0.3.0"
 ndarray-heterogeneous = { path = '../ndarray-heterogeneous' }
 ndarray-type-conversion = { path = '../ndarray-type-conversion' }
-
+itertools = "^0.9"
 
 [[bin]]
 name = 'multiple_linear_regression'
@@ -38,3 +40,11 @@ path = 'src/tree/main.rs'
 [[bin]]
 name = 'data'
 path = 'src/data/main.rs'
+
+[[bin]]
+name = 'random_forest_classifier'
+path = 'src/random_forest_classifier/main.rs'
+
+[[bin]]
+name = 'principal_component_analysis'
+path = 'src/principal_component_analysis/main.rs'

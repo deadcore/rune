@@ -13,3 +13,4 @@ name = "ndarray_heterogeneous"
 
 [dependencies]
 ndarray = "^0.13"
+serde = { version = "^1.0", features = ["derive"] }

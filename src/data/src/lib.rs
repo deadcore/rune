@@ -1,11 +1,33 @@
 use csv::ReaderBuilder;
-use ndarray::{Array, Array1, Array2, azip, array, s};
+use ndarray::{Array, Array1, Array2, azip, array};
 use ndarray_csv::{Array2Reader, ReadError};
 use ndarray_rand::rand::SeedableRng;
 use ndarray_rand::rand_distr::Uniform;
 use ndarray_rand::RandomExt;
+use ndarray_heterogeneous::Scalar;
 use rand_isaac::isaac64::Isaac64Rng;
 
+pub fn read_static_dataset() -> Array2<f64> {
+    return array![
+    [1., 2., 3.],
+    [2., 1., 3.]
+    ];
+}
+
+pub fn read_iris_dataset() -> Result<Array2<Scalar>, ndarray_csv::ReadError> {
+    let csv = include_str!("../iris.csv");
+
+    let mut reader = ReaderBuilder::new().has_headers(true).from_reader(csv.as_bytes());
+    let dataset: Array2<Scalar> = reader.deserialize_array2_dynamic()?;
+
+    // let r: Array2<f64> = dataset.mapv(|v| f(v));
+
+    // fn f(s: String) -> f64 {
+    //     s.parse().unwrap()
+    // }
+
+    Ok(dataset.into_owned())
+}
 
 pub fn read_headbrain_dataset() -> Result<Array2<f64>, ndarray_csv::ReadError> {
     let csv = include_str!("../headbrain.csv");
