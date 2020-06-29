@@ -11,8 +11,9 @@ use ndarray_type_conversion::MapTypeExt;
 use itertools::Itertools;
 use rune_decomposition::principal_component_analysis::PrincipalComponentAnalysis;
 use rune_preprocessing::standard_scaler::StandardScaler;
+use std::error::Error;
 
-fn main() {
+fn main() -> Result<(), Box<dyn Error>>{
     env_logger::init();
 
     let df = read_iris_dataset().unwrap();
@@ -29,8 +30,14 @@ fn main() {
     info!("transformed mean: {:?}", transformed.mean_axis(Axis(0)));
     info!("transformed std: {:?}", transformed.std_axis(Axis(0), 1.));
 
-    let pca = PrincipalComponentAnalysis::new();
-    let x = pca.fit(transformed.view());
+    let pca = PrincipalComponentAnalysis::new(1).fit(transformed.view())?;
+    let x = pca.transform(transformed.view());
+
+    info!("x: {:?}", x);
+    info!("x mean: {:?}", x.mean_axis(Axis(0)));
+    info!("x std: {:?}", x.std_axis(Axis(0), 1.));
 
     // pca.fit(x.view());
+
+    Ok(())
 }
