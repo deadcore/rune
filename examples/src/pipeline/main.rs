@@ -24,11 +24,8 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     let (x_train, x_test, y_train, y_test) = train_test_split(x.view(), y.view(), 0.8);
 
-    let compose = ComposedFit::compose(
-        StandardScaler::new(),
-        PrincipalComponentAnalysis::new(1),
-    );
-
+    let scaler = StandardScaler::new();
+    let pca = PrincipalComponentAnalysis::new(1);
     let decision_tree = DecisionTreeClassifier::new(
         2,
         3,
@@ -38,7 +35,11 @@ fn main() -> Result<(), Box<dyn Error>> {
     );
 
     let pipeline = ComposedFit::compose(
-        compose,
+        scaler,
+        pca,
+    );
+    let pipeline = ComposedFit::compose(
+        pipeline,
         decision_tree,
     );
 

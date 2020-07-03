@@ -59,9 +59,14 @@ impl<F1, F2, In, Out, F1Transformer, F1Output, F2Transformer> ComposedFit<F1, F2
         F2: Fit<F1Output, F2Transformer>,
         F2Transformer: Transformer<F1Output, Out>,
         In: Copy {
-    pub fn compose(f1: F1, f2: F2) -> Self {
+    fn new(f1: F1, f2: F2) -> Self {
         ComposedFit { _in: PhantomData, _out: PhantomData, _F1Transformer: PhantomData, _F1Output: PhantomData, _F2Transformer: PhantomData, f1, f2 }
     }
+
+    pub fn compose(f1: F1, f2: F2) -> Self {
+        ComposedFit::new(f1, f2)
+    }
+
 }
 
 impl<F1, F2, In, Out, F1Transformer, F1Output, F2Transformer> Fit<In, ComposedTransform<In, F1Output, Out, F1Transformer, F2Transformer>> for ComposedFit<F1, F2, In, Out, F1Transformer, F1Output, F2Transformer>
