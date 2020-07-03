@@ -1,4 +1,3 @@
-use std::collections::{HashMap};
 use std::fmt::Debug;
 use std::hash::Hash;
 
@@ -8,45 +7,44 @@ use ndarray::{Array1, Array2, ArrayView1, Axis};
 use std::iter::FromIterator;
 
 #[derive(Debug)]
-pub struct ConfusionMatrix<T: Debug + Eq + Hash> {
-    labels: HashMap<T, usize>,
+pub struct ConfusionMatrix<T: Debug + Eq> {
+    labels: Array1<T>,
     arr: Array2<u64>,
 }
 
-impl<T: Eq + Hash + Debug> ConfusionMatrix<T> {
-    fn new(labels: HashMap<T, usize>, arr: Array2<u64>) -> Self {
+impl<T: Eq + Debug> ConfusionMatrix<T> {
+    fn new(labels: Array1<T>, arr: Array2<u64>) -> Self {
         ConfusionMatrix { labels, arr }
     }
 
-    pub fn from_labels(labels: ArrayView1<T>) -> ConfusionMatrix<T> {
+    pub fn from_labels(labels: ArrayView1<T>) -> ConfusionMatrix<T> where T: Copy + Hash {
+        let itter = labels.iter().unique().map(|v| *v);
 
+        let labels: Array1<T> = Array1::from_iter(itter);
+        let number_of_distinct_values = labels.len();
 
-        let itter = labels.iter().unique();
+        info!("Log: {:?}", labels);
 
-        let x = Array1::from_iter(itter);
-
-        info!("Log: {:?}", x);
-
-        // itertools::assert_equal(itter.unique(), vec!["Hello"]);
+        let arr = Array2::zeros((number_of_distinct_values, number_of_distinct_values));
 
         ConfusionMatrix::new(
-            HashMap::new(),
-            Array2::zeros((0, 0)),
+            labels,
+            arr,
         )
     }
 
-    // pub fn add(&mut self, y_true: T, y_pred: T) {
-    //     let x = *self.labels.get(&y_true).unwrap();
-    //     let y = *self.labels.get(&y_pred).unwrap();
-    //
-    //     self.arr[[x, y]] += 1;
-    // }
-    //
-    // pub fn add_all(&mut self, y_true: ArrayView1<T>, y_pred: ArrayView1<T>) {
-    //     for (&prediction, &target) in y_pred.iter().zip(y_true.iter()) {
-    //         self.add(target, prediction);
-    //     }
-    // }
+    pub fn add(&mut self, y_true: &T, y_pred: &T) {
+        let x = self.labels.iter().position(|p| p == y_true).unwrap();
+        let y = self.labels.iter().position(|p| p == y_pred).unwrap();
+
+        self.arr[[x, y]] += 1;
+    }
+
+    pub fn add_all(&mut self, y_true: ArrayView1<T>, y_pred: ArrayView1<T>) {
+        for (prediction, target) in y_pred.iter().zip(y_true.iter()) {
+            self.add(target, prediction);
+        }
+    }
 
     pub fn false_positive(&self) -> Array1<u64> {
         self.arr.sum_axis(Axis(0)) - self.arr.diag()

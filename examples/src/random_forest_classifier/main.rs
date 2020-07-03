@@ -1,12 +1,7 @@
 use log::*;
 use ndarray::{s, Array1, ArrayView1};
 
-use rune_data::{read_banknote_authentication_dataset, read_iris_dataset};
-use rune_metrics::confusion_matrix::ConfusionMatrix;
-use rune_model_selection::splitting::train_test_split::train_test_split;
-use rune_tree::DecisionTreeClassifier;
-use rune_tree::feature_selector::greedy_feature_selector::GreedyFeatureSelector;
-use rune_tree::measures::entropy::EntropySelectionMeasure;
+use rune_data::{read_iris_dataset};
 use ndarray_type_conversion::MapTypeExt;
 use itertools::Itertools;
 
@@ -14,8 +9,6 @@ fn main() {
     env_logger::init();
 
     let df = read_iris_dataset().unwrap();
-
-    // info!("df.map_type::<f64>(): {:?}", df.map_type::<f64>());
 
     let x = df.slice(s![.., ..4]).map_type::<f64>();
     let y: Array1<String> = df.slice(s![.., 4]).map_type::<String>();
@@ -29,7 +22,7 @@ fn main() {
 
     info!("itter: {:?}", itter);
 
-    let mut cm = ConfusionMatrix::from_labels(y.view());
+    // let mut cm = ConfusionMatrix::from_labels(y.view());
 
     // let (x_train, x_test, y_train, y_test) = train_test_split(x.view(), y.view(), 0.8);
     //

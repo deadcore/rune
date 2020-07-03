@@ -6,11 +6,24 @@ use std::fmt::Debug;
 use std::hash::Hash;
 
 use log::*;
-use ndarray::{Array1, ArrayView1, ArrayView2, Axis};
+use ndarray::{Array1, ArrayView1, ArrayView2, Axis, Array2};
 use crate::feature_selector::FeatureSelector;
 use crate::math::histogram::histogram;
 use crate::measures::entropy::entropy;
+use rune_pipeline::pipeline::{Fit, Transformer};
 
+
+impl<FS: FeatureSelector + Debug> Fit<Array2<f64>, DecisionTreeModel<bool>> for DecisionTreeClassifier<FS> {
+    fn fit(&self, x: Array2<f64>, y: ArrayView1<bool>) -> DecisionTreeModel<bool> {
+        self.fit_internal(x.view(), y)
+    }
+}
+
+impl Transformer<Array2<f64>, Array1<bool>> for DecisionTreeModel<bool> {
+    fn transform(&self, x: Array2<f64>) -> Array1<bool> {
+        self.predict(x.view())
+    }
+}
 
 #[derive(Debug)]
 pub struct DecisionTreeClassifier<FS> {
@@ -101,7 +114,7 @@ impl<FS> DecisionTreeClassifier<FS> where FS: FeatureSelector + Debug {
         }
     }
 
-    pub fn fit<Y: Copy + Hash + Eq>(&self, x: ArrayView2<f64>, y: ArrayView1<Y>) -> DecisionTreeModel<Y> {
+    pub fn fit_internal<Y: Copy + Hash + Eq>(&self, x: ArrayView2<f64>, y: ArrayView1<Y>) -> DecisionTreeModel<Y> {
         DecisionTreeModel {
             tree: self.build_tree(x, y, 0)
         }

@@ -71,7 +71,7 @@ impl From<Scalar> for f64 {
             Scalar::I64(i) => i as f64,
             Scalar::F64(i) => i,
             Scalar::BOOL(i) => if i { 1. } else { 0. },
-            Scalar::STRING(i) => 0.0
+            Scalar::STRING(i) => i.parse().unwrap()
         }
     }
 }

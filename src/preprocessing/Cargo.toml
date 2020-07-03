@@ -15,3 +15,4 @@ name = "rune_preprocessing"
 log = "^0.4"
 ndarray = "^0.13"
 ndarray-stats = "^0.3"
+rune-pipeline = { path = '../pipeline' }

@@ -25,13 +25,13 @@ fn main() -> Result<(), Box<dyn Error>>{
 
     let scaler = StandardScaler::new();
 
-    let transformed = scaler.fit(x.view()).transform(x.view());
-    info!("transformed: {:?}", transformed);
-    info!("transformed mean: {:?}", transformed.mean_axis(Axis(0)));
-    info!("transformed std: {:?}", transformed.std_axis(Axis(0), 1.));
+    let x = scaler.fit(x.view()).transform(x.view());
+    info!("transformed: {:?}", x);
+    info!("transformed mean: {:?}", x.mean_axis(Axis(0)));
+    info!("transformed std: {:?}", x.std_axis(Axis(0), 1.));
 
-    let pca = PrincipalComponentAnalysis::new(1).fit(transformed.view())?;
-    let x = pca.transform(transformed.view());
+    let pca = PrincipalComponentAnalysis::new(1);
+    let x = pca.fit(x.view())?.transform(x.view());
 
     info!("x: {:?}", x);
     info!("x mean: {:?}", x.mean_axis(Axis(0)));

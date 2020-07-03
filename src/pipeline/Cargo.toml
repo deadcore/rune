@@ -1,5 +1,5 @@
 [package]
-name = "rune-tree"
+name = "rune-pipeline"
 version = "0.1.0"
 authors = ["Jack <admin@deadcore.co.uk>"]
 edition = "2018"
@@ -9,9 +9,8 @@ workspace = "../.."
 default = []
 
 [lib]
-name = "rune_tree"
+name = "rune_pipeline"
 
 [dependencies]
 log = "^0.4"
 ndarray = "^0.13"
-rune-pipeline = { path = '../pipeline' }

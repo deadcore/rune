@@ -1,11 +1,11 @@
-use ndarray::{ArrayView1, Axis, ArrayView2, Array2, stack, Array};
+use ndarray::{Axis, ArrayView2, Array2, stack, Array, ArrayView1};
 
 use log::debug;
 use ndarray_stats::CorrelationExt;
-use ndarray_stats::errors::EmptyInput;
 use ndarray_linalg::{Eigh, UPLO};
 use std::error::Error;
 use std::cmp::Ordering;
+use rune_pipeline::pipeline::{Transformer, Fit};
 
 #[derive(Debug)]
 pub struct PrincipalComponentAnalysis {
@@ -16,12 +16,37 @@ pub struct PrincipalComponentAnalysisTransformer {
     projection: Array2<f64>,
 }
 
+impl Transformer<ArrayView2<'_, f64>, Array2<f64>> for PrincipalComponentAnalysisTransformer {
+    fn transform(&self, x: ArrayView2<'_, f64>) -> Array2<f64> {
+        self.internal_transform(x)
+    }
+}
+
+impl Transformer<Array2<f64>, Array2<f64>> for PrincipalComponentAnalysisTransformer {
+    fn transform(&self, x: Array2<f64>) -> Array2<f64> {
+        self.internal_transform(x.view())
+    }
+}
+
+
+impl Fit<ArrayView2<'_, f64>, PrincipalComponentAnalysisTransformer> for PrincipalComponentAnalysis {
+    fn fit(&self, x: ArrayView2<f64>, y: ArrayView1<bool>) -> PrincipalComponentAnalysisTransformer {
+        self.internal_fit(x).unwrap()
+    }
+}
+
+impl Fit<Array2<f64>, PrincipalComponentAnalysisTransformer> for PrincipalComponentAnalysis {
+    fn fit(&self, x: Array2<f64>, y: ArrayView1<bool>) -> PrincipalComponentAnalysisTransformer {
+        self.internal_fit(x.view()).unwrap()
+    }
+}
+
 impl PrincipalComponentAnalysisTransformer {
     pub fn new(projection: Array2<f64>) -> Self {
         PrincipalComponentAnalysisTransformer { projection }
     }
 
-    pub fn transform(&self, x: ArrayView2<f64>) -> Array2<f64> {
+    pub fn internal_transform(&self, x: ArrayView2<f64>) -> Array2<f64> {
         return x.dot(&self.projection);
     }
 }
@@ -33,7 +58,7 @@ impl PrincipalComponentAnalysis {
         }
     }
 
-    pub fn fit(&self, x: ArrayView2<f64>) -> Result<PrincipalComponentAnalysisTransformer, Box<dyn Error>> {
+    pub fn internal_fit(&self, x: ArrayView2<f64>) -> Result<PrincipalComponentAnalysisTransformer, Box<dyn Error>> {
         let co_variance_matrix = x.t().cov(1.)?;
         debug!("co_variance_matrix: \n {}", co_variance_matrix);
 

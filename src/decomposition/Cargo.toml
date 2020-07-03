@@ -16,3 +16,4 @@ log = "^0.4"
 ndarray = "^0.13"
 ndarray-stats = "^0.3"
 ndarray-linalg = { version = "^0.12", features = ["intel-mkl"] }
+rune-pipeline = { path = '../pipeline' }

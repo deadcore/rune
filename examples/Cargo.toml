@@ -13,6 +13,7 @@ rune-metrics = { path = '../src/metrics' }
 rune-tree = { path = '../src/tree' }
 rune-decomposition = { path = '../src/decomposition' }
 rune-preprocessing = { path = '../src/preprocessing' }
+rune-pipeline = { path = '../src/pipeline' }
 
 log = "^0.4"
 env_logger = "^0.7"
@@ -48,3 +49,7 @@ path = 'src/random_forest_classifier/main.rs'
 [[bin]]
 name = 'principal_component_analysis'
 path = 'src/principal_component_analysis/main.rs'
+
+[[bin]]
+name = 'pipeline'
+path = 'src/pipeline/main.rs'

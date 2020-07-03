@@ -8,6 +8,7 @@ members = [
     "src/ensemble",
     'src/decomposition',
     'src/preprocessing',
+    'src/pipeline',
     'ndarray-heterogeneous',
     'ndarray-type-conversion',
     "examples",
